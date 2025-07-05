@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Login } from "./components/Login";
 import { CambiarPassword } from "./components/CambiarPassword";
 import { AdminUsuarios } from "./components/AdminUsuarios";
+import Navbar from './components/Navbar';
 
 // Componente para proteger rutas
 function RutaProtegida({ token, children }) {
@@ -15,6 +16,8 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("jwtToken") || null);
 
   return (
+    <>
+    <Navbar token={token} onLogout={() => setToken(null)} />
     <Routes>
       <Route path="/login" element={<Login onLogin={setToken} />} />
 
@@ -49,6 +52,7 @@ function App() {
 />
 
     </Routes>
+    </>
   );
 }
 
