@@ -4,6 +4,7 @@ export function AdminUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [nuevoUsuario, setNuevoUsuario] = useState({ username: "", password: "" });
   const [mensaje, setMensaje] = useState("");
+  const [menuAbierto, setMenuAbierto] = useState(null); // ID del usuario cuyo menú está abierto
 
   useEffect(() => {
     cargarUsuarios();
@@ -33,6 +34,24 @@ export function AdminUsuarios() {
         setMensaje(`Contraseña cambiada para ${username}`);
       } else {
         setMensaje(`Error al cambiar contraseña para ${username}`);
+      }
+    } catch {
+      setMensaje("Error en la petición");
+    }
+  };
+
+  const handleEliminarUsuario = async (username) => {
+    if (!window.confirm(`¿Eliminar usuario ${username}?`)) return;
+
+    try {
+      const res = await fetch(`http://localhost:8080/auth/users/${username}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setMensaje(`Usuario ${username} eliminado`);
+        cargarUsuarios();
+      } else {
+        setMensaje(`Error eliminando usuario ${username}`);
       }
     } catch {
       setMensaje("Error en la petición");
@@ -72,11 +91,29 @@ export function AdminUsuarios() {
 
       <ul>
         {usuarios.map((u) => (
-          <li key={u.id}>
+          <li key={u.id} style={{ position: "relative" }}>
             {u.username}{" "}
-            <button onClick={() => handleCambiarPassword(u.username)}>
-              Cambiar Contraseña
+            <button onClick={() => setMenuAbierto(menuAbierto === u.id ? null : u.id)}>
+              ⋮
             </button>
+
+            {menuAbierto === u.id && (
+              <div style={{
+                position: "absolute",
+                background: "#f0f0f0",
+                border: "1px solid #ccc",
+                padding: "5px",
+                marginTop: "5px",
+                zIndex: 10
+              }}>
+                <button onClick={() => { handleCambiarPassword(u.username); setMenuAbierto(null); }}>
+                  Cambiar Contraseña
+                </button>
+                <button onClick={() => { handleEliminarUsuario(u.username); setMenuAbierto(null); }}>
+                  Eliminar Usuario
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>

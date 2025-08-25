@@ -14,4 +14,17 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
+// Interceptor para manejar errores de autenticación/autorización
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // Token inválido, expirado o sin permisos
+      localStorage.removeItem("jwtToken");
+      window.location.href = "/login"; // Redirige al login
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default instance;
