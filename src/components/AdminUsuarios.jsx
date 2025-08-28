@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "../services/axiosConfig"; // Axios con token incluido
 
 export function AdminUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -10,54 +11,48 @@ export function AdminUsuarios() {
     cargarUsuarios();
   }, []);
 
+  // Cargar todos los usuarios
   const cargarUsuarios = async () => {
     try {
-      const res = await fetch("http://localhost:8080/auth/users");
-      const data = await res.json();
-      setUsuarios(data);
-    } catch {
+      const res = await axios.get("/users");
+      setUsuarios(res.data);
+    } catch (err) {
+      console.error(err);
       setMensaje("Error cargando usuarios");
     }
   };
 
+  // Cambiar contraseña de un usuario
   const handleCambiarPassword = async (username) => {
     const nuevaClave = prompt(`Nueva contraseña para ${username}:`);
     if (!nuevaClave) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/auth/users/${username}/password`, {
-        method: "PUT",
+      const res = await axios.put(`/users/${username}/password`, nuevaClave, {
         headers: { "Content-Type": "text/plain" },
-        body: nuevaClave,
       });
-      if (res.ok) {
-        setMensaje(`Contraseña cambiada para ${username}`);
-      } else {
-        setMensaje(`Error al cambiar contraseña para ${username}`);
-      }
-    } catch {
-      setMensaje("Error en la petición");
+      setMensaje(res.data.mensaje || `Contraseña cambiada para ${username}`);
+    } catch (err) {
+      console.error(err);
+      setMensaje(err.response?.data?.error || "Error al cambiar contraseña");
     }
   };
 
+  // Eliminar un usuario
   const handleEliminarUsuario = async (username) => {
     if (!window.confirm(`¿Eliminar usuario ${username}?`)) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/auth/users/${username}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        setMensaje(`Usuario ${username} eliminado`);
-        cargarUsuarios();
-      } else {
-        setMensaje(`Error eliminando usuario ${username}`);
-      }
-    } catch {
-      setMensaje("Error en la petición");
+      const res = await axios.delete(`/users/${username}`);
+      setMensaje(res.data.mensaje || `Usuario ${username} eliminado`);
+      cargarUsuarios();
+    } catch (err) {
+      console.error(err);
+      setMensaje(err.response?.data?.error || "Error eliminando usuario");
     }
   };
 
+  // Crear un nuevo usuario
   const handleCrearUsuario = async (e) => {
     e.preventDefault();
     if (!nuevoUsuario.username || !nuevoUsuario.password) {
@@ -66,50 +61,44 @@ export function AdminUsuarios() {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/auth/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoUsuario),
-      });
-      if (res.ok) {
-        setMensaje("Usuario creado");
-        setNuevoUsuario({ username: "", password: "" });
-        cargarUsuarios();
-      } else {
-        const text = await res.text();
-        setMensaje(text || "Error creando usuario");
-      }
-    } catch {
-      setMensaje("Error en la petición");
+      const res = await axios.post("/users", nuevoUsuario);
+      setMensaje(res.data.mensaje || "Usuario creado");
+      setNuevoUsuario({ username: "", password: "" });
+      cargarUsuarios();
+    } catch (err) {
+      console.error(err);
+      setMensaje(err.response?.data?.error || "Error creando usuario");
     }
   };
 
   return (
-    <div>
-      <h2>Administración de Usuarios</h2>
-      {mensaje && <p>{mensaje}</p>}
+    <div className="p-4">
+      <h2 className="text-xl font-bold mb-4">Administración de Usuarios</h2>
+      {mensaje && <p className="mb-4 text-red-600">{mensaje}</p>}
 
-      <ul>
+      <ul className="mb-6">
         {usuarios.map((u) => (
-          <li key={u.id} style={{ position: "relative" }}>
+          <li key={u.id} className="mb-2 relative">
             {u.username}{" "}
-            <button onClick={() => setMenuAbierto(menuAbierto === u.id ? null : u.id)}>
+            <button
+              className="ml-2 px-2 py-1 bg-gray-300 rounded"
+              onClick={() => setMenuAbierto(menuAbierto === u.id ? null : u.id)}
+            >
               ⋮
             </button>
 
             {menuAbierto === u.id && (
-              <div style={{
-                position: "absolute",
-                background: "#f0f0f0",
-                border: "1px solid #ccc",
-                padding: "5px",
-                marginTop: "5px",
-                zIndex: 10
-              }}>
-                <button onClick={() => { handleCambiarPassword(u.username); setMenuAbierto(null); }}>
+              <div className="absolute bg-gray-100 border p-2 mt-1 z-10">
+                <button
+                  className="block w-full mb-1 text-left px-2 py-1 hover:bg-gray-200"
+                  onClick={() => { handleCambiarPassword(u.username); setMenuAbierto(null); }}
+                >
                   Cambiar Contraseña
                 </button>
-                <button onClick={() => { handleEliminarUsuario(u.username); setMenuAbierto(null); }}>
+                <button
+                  className="block w-full text-left px-2 py-1 hover:bg-gray-200"
+                  onClick={() => { handleEliminarUsuario(u.username); setMenuAbierto(null); }}
+                >
                   Eliminar Usuario
                 </button>
               </div>
@@ -118,13 +107,14 @@ export function AdminUsuarios() {
         ))}
       </ul>
 
-      <form onSubmit={handleCrearUsuario}>
-        <h3>Crear nuevo usuario</h3>
+      <form onSubmit={handleCrearUsuario} className="border-t pt-4">
+        <h3 className="font-semibold mb-2">Crear nuevo usuario</h3>
         <input
           type="text"
           placeholder="Usuario"
           value={nuevoUsuario.username}
           onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, username: e.target.value })}
+          className="border p-1 mr-2"
           required
         />
         <input
@@ -132,9 +122,10 @@ export function AdminUsuarios() {
           placeholder="Contraseña"
           value={nuevoUsuario.password}
           onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })}
+          className="border p-1 mr-2"
           required
         />
-        <button type="submit">Crear Usuario</button>
+        <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded">Crear Usuario</button>
       </form>
     </div>
   );
