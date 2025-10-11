@@ -7,6 +7,7 @@ export function MenuPrincipal() {
       <h2>Módulos disponibles</h2>
       <ul>
         <li><Link to="/productos">Lista de Productos</Link></li>
+        <li><Link to="/depositos">Lista de Depositos</Link></li>
         <li><Link to="/admin">Administrar Usuarios</Link></li>
         <li><Link to="/cambiar-password">Cambiar Contraseña</Link></li>
         <li><Link to="/admin-roles">Administrar Roles</Link></li>

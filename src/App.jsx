@@ -8,6 +8,8 @@ import { AdminUsuarios } from "./components/AdminUsuarios";
 import Navbar from './components/Navbar';
 import { MenuPrincipal } from "./components/MenuPrincipal"; 
 import   {AdminRoles}   from "./components/AdminRoles";
+import ListaDepositos from './components/ListaDepositos';
+import FormularioDeposito from './components/FormularioDeposito';
 
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
@@ -93,6 +95,34 @@ function App() {
             </RutaProtegida>
           }
         />
+
+        <Route
+          path="/depositos"
+          element={
+            <RutaProtegida token={token}>
+              <ListaDepositos />
+            </RutaProtegida>
+          }
+        />  
+
+        <Route
+          path="/agregar-deposito"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioDeposito />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/editar-deposito/:id"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioDeposito />
+            </RutaProtegida>
+          }
+        />
+
       </Routes>
     </>
   );

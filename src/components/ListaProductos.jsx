@@ -27,7 +27,7 @@ const ListaProductos = () => {
       <ul>
         {productos.map(p => (
           <li key={p.id}>
-            {p.nombre} - {p.cantidad}
+            {p.nombre} - {p.precio}
             <button onClick={() => navigate(`/editar/${p.id}`)}>Editar</button>
             <button onClick={() => handleEliminar(p.id)}>Eliminar</button>
           </li>
