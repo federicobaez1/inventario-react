@@ -10,6 +10,8 @@ import { MenuPrincipal } from "./components/MenuPrincipal";
 import   {AdminRoles}   from "./components/AdminRoles";
 import ListaDepositos from './components/ListaDepositos';
 import FormularioDeposito from './components/FormularioDeposito';
+import ListaEquipos from './components/ListaEquipos';
+import FormularioEquipo from './components/FormularioEquipo';
 
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
@@ -119,6 +121,33 @@ function App() {
           element={
             <RutaProtegida token={token}>
               <FormularioDeposito />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/equipos"
+          element={
+            <RutaProtegida token={token}>
+              <ListaEquipos />
+            </RutaProtegida>
+          }
+        />  
+
+        <Route
+          path="/agregar-equipo"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioEquipo />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/editar-equipo/:id"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioEquipo />
             </RutaProtegida>
           }
         />

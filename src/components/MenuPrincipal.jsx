@@ -8,6 +8,7 @@ export function MenuPrincipal() {
       <ul>
         <li><Link to="/productos">Lista de Productos</Link></li>
         <li><Link to="/depositos">Lista de Depositos</Link></li>
+        <li><Link to="/equipos">Lista de Equipos</Link></li>
         <li><Link to="/admin">Administrar Usuarios</Link></li>
         <li><Link to="/cambiar-password">Cambiar Contraseña</Link></li>
         <li><Link to="/admin-roles">Administrar Roles</Link></li>
