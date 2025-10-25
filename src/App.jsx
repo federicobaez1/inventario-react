@@ -12,6 +12,8 @@ import ListaDepositos from './components/ListaDepositos';
 import FormularioDeposito from './components/FormularioDeposito';
 import ListaEquipos from './components/ListaEquipos';
 import FormularioEquipo from './components/FormularioEquipo';
+import ListaInventarios from './components/ListaInventarios';
+import FormularioInventario from './components/FormularioInventario';
 
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
@@ -148,6 +150,33 @@ function App() {
           element={
             <RutaProtegida token={token}>
               <FormularioEquipo />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/inventarios"
+          element={
+            <RutaProtegida token={token}>
+              <ListaInventarios />
+            </RutaProtegida>
+          }
+        />  
+
+        <Route
+          path="/agregar-inventario"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioInventario />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/editar-inventario/:id"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioInventario />
             </RutaProtegida>
           }
         />
