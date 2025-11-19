@@ -14,6 +14,10 @@ import ListaEquipos from './components/ListaEquipos';
 import FormularioEquipo from './components/FormularioEquipo';
 import ListaInventarios from './components/ListaInventarios';
 import FormularioInventario from './components/FormularioInventario';
+import ListaEmpleadoEquipos from './components/ListaEmpleadoEquipos';
+import FormularioEmpleadoEquipo from './components/FormularioEmpleadoEquipo';
+import ListaEmpleados from './components/ListaEmpleados';
+import FormularioEmpleado from './components/FormularioEmpleado';
 
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
@@ -177,6 +181,60 @@ function App() {
           element={
             <RutaProtegida token={token}>
               <FormularioInventario />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/empleadoEquipos"
+          element={
+            <RutaProtegida token={token}>
+              <ListaEmpleadoEquipos />
+            </RutaProtegida>
+          }
+        />  
+
+        <Route
+          path="/agregar-empleadoEquipo"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioEmpleadoEquipo />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/editar-empleadoEquipo/:id"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioEmpleadoEquipo />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/empleados"
+          element={
+            <RutaProtegida token={token}>
+              <ListaEmpleados />
+            </RutaProtegida>
+          }
+        />  
+
+        <Route
+          path="/agregar-empleado"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioEmpleado />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/editar-empleado/:id"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioEmpleado />
             </RutaProtegida>
           }
         />
