@@ -18,6 +18,8 @@ import ListaEmpleadoEquipos from './components/ListaEmpleadoEquipos';
 import FormularioEmpleadoEquipo from './components/FormularioEmpleadoEquipo';
 import ListaEmpleados from './components/ListaEmpleados';
 import FormularioEmpleado from './components/FormularioEmpleado';
+import ListaDetalleInventarios from './components/ListaDetalleInventarios';
+import FormularioDetalleInventario from './components/FormularioDetalleInventario';
 
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
@@ -235,6 +237,33 @@ function App() {
           element={
             <RutaProtegida token={token}>
               <FormularioEmpleado />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/detalleInventarios"
+          element={
+            <RutaProtegida token={token}>
+              <ListaDetalleInventarios />
+            </RutaProtegida>
+          }
+        />  
+
+        <Route
+          path="/agregar-detalleInventario"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioDetalleInventario />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/editar-detalleInventario/:id"
+          element={
+            <RutaProtegida token={token}>
+              <FormularioDetalleInventario />
             </RutaProtegida>
           }
         />

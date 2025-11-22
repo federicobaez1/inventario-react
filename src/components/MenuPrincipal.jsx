@@ -15,6 +15,8 @@ export function MenuPrincipal() {
         <li><Link to="/cambiar-password">Cambiar Contraseña</Link></li>
         <li><Link to="/admin-roles">Administrar Roles</Link></li>
         <li><Link to="/empleados">Lista de Empleados</Link></li>
+        <li><Link to="/detalleInventarios">Lista de Detalles Inventario</Link></li>
+
       </ul>
     </div>
   );
