@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getDetalleInventarios, eliminarDetalleInventario } from '../services/detalleInventarioService';
 import { useNavigate } from 'react-router-dom';
+import ExcelExportButton from "../components/ExcelExportButton";
 
 const ListaDetalleInventarios = () => {
   const [detalles, setDetalles] = useState([]);
@@ -23,6 +24,15 @@ const ListaDetalleInventarios = () => {
       cargar();
     }
   };
+
+  const columnas = ["id", "producto", "cantidad", "fechaConteo"];
+
+const filas = detalles.map(d => ({
+    id: d.id,
+    producto: d.productoNombre,
+    cantidad: d.cantidad,
+    fechaConteo: d.fechaConteo
+}));
 
   return (
     <div>
@@ -59,6 +69,11 @@ const ListaDetalleInventarios = () => {
       </ul>
 
       {detalles.length === 0 && <p>No hay detalles cargados.</p>}
+      <ExcelExportButton
+      columns={columnas}
+      rows={filas}
+      fileName="detalleInventarios.xlsx"
+    />
     </div>
   );
 };
