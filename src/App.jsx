@@ -20,6 +20,7 @@ import ListaEmpleados from './components/ListaEmpleados';
 import FormularioEmpleado from './components/FormularioEmpleado';
 import ListaDetalleInventarios from './components/ListaDetalleInventarios';
 import FormularioDetalleInventario from './components/FormularioDetalleInventario';
+import ImportarExcelPage from "./components/ImportarExcelPage";
 
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
@@ -264,6 +265,15 @@ function App() {
           element={
             <RutaProtegida token={token}>
               <FormularioDetalleInventario />
+            </RutaProtegida>
+          }
+        />
+
+        <Route
+          path="/importar-excel"
+          element={
+            <RutaProtegida token={token}>
+              <ImportarExcelPage />
             </RutaProtegida>
           }
         />

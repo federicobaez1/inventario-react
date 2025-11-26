@@ -16,6 +16,7 @@ export function MenuPrincipal() {
         <li><Link to="/admin-roles">Administrar Roles</Link></li>
         <li><Link to="/empleados">Lista de Empleados</Link></li>
         <li><Link to="/detalleInventarios">Lista de Detalles Inventario</Link></li>
+        <li><Link to="/importar-excel">Importar </Link></li>
 
       </ul>
     </div>
