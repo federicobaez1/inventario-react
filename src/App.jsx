@@ -5,8 +5,7 @@ import FormularioProducto from './components/FormularioProducto';
 import { Login } from "./components/Login";
 import { CambiarPassword } from "./components/CambiarPassword";
 import { AdminUsuarios } from "./components/AdminUsuarios";
-import Navbar from './components/Navbar';
-import { MenuPrincipal } from "./components/MenuPrincipal"; 
+ 
 import   {AdminRoles}   from "./components/AdminRoles";
 import ListaDepositos from './components/ListaDepositos';
 import FormularioDeposito from './components/FormularioDeposito';
@@ -21,7 +20,7 @@ import FormularioEmpleado from './components/FormularioEmpleado';
 import ListaDetalleInventarios from './components/ListaDetalleInventarios';
 import FormularioDetalleInventario from './components/FormularioDetalleInventario';
 import ImportarExcelPage from "./components/ImportarExcelPage";
-
+import Layout from "./components/Layout";
 function RutaProtegida({ token, children }) {
   return token ? children : <Navigate to="/login" />;
 }
@@ -32,253 +31,64 @@ function App() {
 
   const handleLogin = (token) => {
     setToken(token);
-    navigate("/menu"); // REDIRIGE A MENU DESPUÉS DE LOGIN
+    navigate("/productos"); 
   };
 
   return (
     <>
-      <Navbar token={token} onLogout={() => setToken(null)} />
+      
       <Routes>
-        {/* Redirigir raíz a /login o /menu */}
-        <Route path="/" element={<Navigate to={token ? "/menu" : "/login"} />} />
+  {/* Redirección inicial */}
+  <Route path="/" element={<Navigate to={token ? "/productos" : "/login"} />} />
 
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+  {/* Login fuera del layout */}
+  <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
-        <Route
-          path="/menu"
-          element={
-            <RutaProtegida token={token}>
-              <MenuPrincipal />
-            </RutaProtegida>
-          }
-        />
+  {/* Todo lo protegido va dentro del Layout */}
+  <Route
+    path="/"
+    element={
+      <RutaProtegida token={token}>
+        <Layout />
+      </RutaProtegida>
+    }
+  >
+    <Route path="productos" element={<ListaProductos />} />
+    <Route path="agregar" element={<FormularioProducto />} />
+    <Route path="editar/:id" element={<FormularioProducto />} />
 
-        <Route
-          path="/productos"
-          element={
-            <RutaProtegida token={token}>
-              <ListaProductos />
-            </RutaProtegida>
-          }
-        />
+    <Route path="depositos" element={<ListaDepositos />} />
+    <Route path="agregar-deposito" element={<FormularioDeposito />} />
+    <Route path="editar-deposito/:id" element={<FormularioDeposito />} />
 
-        <Route
-          path="/admin"
-          element={
-            <RutaProtegida token={token}>
-              <AdminUsuarios />
-            </RutaProtegida>
-          }
-        />
+    <Route path="equipos" element={<ListaEquipos />} />
+    <Route path="agregar-equipo" element={<FormularioEquipo />} />
+    <Route path="editar-equipo/:id" element={<FormularioEquipo />} />
 
-        <Route
-          path="/admin-roles"
-          element={
-            <RutaProtegida token={token}>
-              <AdminRoles />
-            </RutaProtegida>
-          }
-        />
+    <Route path="inventarios" element={<ListaInventarios />} />
+    <Route path="agregar-inventario" element={<FormularioInventario />} />
+    <Route path="editar-inventario/:id" element={<FormularioInventario />} />
 
-        <Route
-          path="/agregar"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioProducto />
-            </RutaProtegida>
-          }
-        />
+    <Route path="empleadoequipos" element={<ListaEmpleadoEquipos />} />
+    <Route path="agregar-empleadoEquipo" element={<FormularioEmpleadoEquipo />} />
+    <Route path="editar-empleadoEquipo/:id" element={<FormularioEmpleadoEquipo />} />
 
-        <Route
-          path="/editar/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioProducto />
-            </RutaProtegida>
-          }
-        />
+    <Route path="empleados" element={<ListaEmpleados />} />
+    <Route path="agregar-empleado" element={<FormularioEmpleado />} />
+    <Route path="editar-empleado/:id" element={<FormularioEmpleado />} />
 
-        <Route
-          path="/cambiar-password"
-          element={
-            <RutaProtegida token={token}>
-              <CambiarPassword />
-            </RutaProtegida>
-          }
-        />
+    <Route path="detalleInventarios" element={<ListaDetalleInventarios />} />
+    <Route path="agregar-detalleInventario" element={<FormularioDetalleInventario />} />
+    <Route path="editar-detalleInventario/:id" element={<FormularioDetalleInventario />} />
 
-        <Route
-          path="/depositos"
-          element={
-            <RutaProtegida token={token}>
-              <ListaDepositos />
-            </RutaProtegida>
-          }
-        />  
+    <Route path="admin" element={<AdminUsuarios />} />
+    <Route path="admin-roles" element={<AdminRoles />} />
+    <Route path="cambiar-password" element={<CambiarPassword />} />
 
-        <Route
-          path="/agregar-deposito"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioDeposito />
-            </RutaProtegida>
-          }
-        />
+    <Route path="importar-excel" element={<ImportarExcelPage />} />
+  </Route>
+</Routes>
 
-        <Route
-          path="/editar-deposito/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioDeposito />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/equipos"
-          element={
-            <RutaProtegida token={token}>
-              <ListaEquipos />
-            </RutaProtegida>
-          }
-        />  
-
-        <Route
-          path="/agregar-equipo"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioEquipo />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/editar-equipo/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioEquipo />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/inventarios"
-          element={
-            <RutaProtegida token={token}>
-              <ListaInventarios />
-            </RutaProtegida>
-          }
-        />  
-
-        <Route
-          path="/agregar-inventario"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioInventario />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/editar-inventario/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioInventario />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/empleadoEquipos"
-          element={
-            <RutaProtegida token={token}>
-              <ListaEmpleadoEquipos />
-            </RutaProtegida>
-          }
-        />  
-
-        <Route
-          path="/agregar-empleadoEquipo"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioEmpleadoEquipo />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/editar-empleadoEquipo/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioEmpleadoEquipo />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/empleados"
-          element={
-            <RutaProtegida token={token}>
-              <ListaEmpleados />
-            </RutaProtegida>
-          }
-        />  
-
-        <Route
-          path="/agregar-empleado"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioEmpleado />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/editar-empleado/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioEmpleado />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/detalleInventarios"
-          element={
-            <RutaProtegida token={token}>
-              <ListaDetalleInventarios />
-            </RutaProtegida>
-          }
-        />  
-
-        <Route
-          path="/agregar-detalleInventario"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioDetalleInventario />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/editar-detalleInventario/:id"
-          element={
-            <RutaProtegida token={token}>
-              <FormularioDetalleInventario />
-            </RutaProtegida>
-          }
-        />
-
-        <Route
-          path="/importar-excel"
-          element={
-            <RutaProtegida token={token}>
-              <ImportarExcelPage />
-            </RutaProtegida>
-          }
-        />
-
-      </Routes>
     </>
   );
 }
