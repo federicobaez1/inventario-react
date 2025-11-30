@@ -1,17 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { getEmpleadoEquipos, eliminarEmpleadoEquipo } from '../services/empleadoEquipoService';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { getEmpleadoEquipos, eliminarEmpleadoEquipo } from "../services/empleadoEquipoService";
+import { useNavigate } from "react-router-dom";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  IconButton,
+  Typography,
+  Box,
+} from "@mui/material";
+
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ListaEmpleadoEquipos = () => {
   const [empleadoEquipos, setEmpleadoEquipos] = useState([]);
   const navigate = useNavigate();
 
-  // Mapeo opcional para mostrar roles legibles
   const ROLES = {
     0: "Sin rol",
-    1: "Rol 1",
-    2: "Rol 2",
-    3: "Rol 3",
+    1: "Líder",
+    2: "Técnico",
+    3: "Asistente",
   };
 
   useEffect(() => {
@@ -24,35 +40,69 @@ const ListaEmpleadoEquipos = () => {
   };
 
   const handleEliminar = async (id) => {
+    if (!window.confirm("¿Eliminar asignación?")) return;
     await eliminarEmpleadoEquipo(id);
     cargarEmpleadoEquipos();
   };
 
   return (
-    <div>
-      <h2>Lista de EmpleadoEquipos</h2>
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h5">Asignación Empleado → Equipo</Typography>
 
-      <button onClick={() => navigate('/agregar-empleadoEquipo')}>
-        Agregar EmpleadoEquipo
-      </button>
+        <Button
+          variant="contained"
+          onClick={() => navigate("/agregar-empleadoEquipo")}
+        >
+          Agregar
+        </Button>
+      </Box>
 
-      <ul>
-        {empleadoEquipos.map((p) => (
-          <li key={p.id}>
-            <strong>{p.empleadoNombre}</strong> — {p.equipoNombre}  
-            {" | Rol: "}{ROLES[p.tipoRol] ?? "No asignado"}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Empleado</strong></TableCell>
+              <TableCell><strong>Equipo</strong></TableCell>
+              <TableCell><strong>Rol</strong></TableCell>
+              <TableCell align="right"><strong>Acciones</strong></TableCell>
+            </TableRow>
+          </TableHead>
 
-            <button onClick={() => navigate(`/editar-empleadoEquipo/${p.id}`)}>
-              Editar
-            </button>
+          <TableBody>
+            {empleadoEquipos.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.empleadoNombre}</TableCell>
+                <TableCell>{item.equipoNombre}</TableCell>
+                <TableCell>{ROLES[item.tipoRol] ?? "No asignado"}</TableCell>
 
-            <button onClick={() => handleEliminar(p.id)}>
-              Eliminar
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+                <TableCell align="right">
+                  <IconButton
+                    color="primary"
+                    onClick={() => navigate(`/editar-empleadoEquipo/${item.id}`)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+
+                  <IconButton color="error" onClick={() => handleEliminar(item.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {empleadoEquipos.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  No hay asignaciones registradas
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 

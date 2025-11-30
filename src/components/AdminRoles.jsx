@@ -1,5 +1,18 @@
 import { useState, useEffect } from "react";
-import axios from "../services/axiosConfig"; // Axios configurado con JWT
+import axios from "../services/axiosConfig";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  IconButton,
+  Alert,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export function AdminRoles() {
   const [roles, setRoles] = useState([]);
@@ -13,15 +26,14 @@ export function AdminRoles() {
   const cargarRoles = async () => {
     try {
       const res = await axios.get("/roles");
-      // Asegurarse que sea un array
       setRoles(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error al obtener roles:", err);
-      if (err.response && err.response.status === 403) {
-        setMensaje("No tiene permisos para ver los roles");
-      } else {
-        setMensaje("Error cargando roles");
-      }
+      setMensaje(
+        err.response?.status === 403
+          ? "No tiene permisos para ver los roles"
+          : "Error cargando roles"
+      );
     }
   };
 
@@ -38,13 +50,13 @@ export function AdminRoles() {
       }
     } catch (err) {
       console.error("Error creando rol:", err);
-      if (err.response && err.response.status === 403) {
-        setMensaje("No tiene permisos para crear roles");
-      } else if (err.response && err.response.status === 400) {
-        setMensaje("El rol ya existe");
-      } else {
-        setMensaje("Error creando rol");
-      }
+      setMensaje(
+        err.response?.status === 403
+          ? "No tiene permisos para crear roles"
+          : err.response?.status === 400
+          ? "El rol ya existe"
+          : "Error creando rol"
+      );
     }
   };
 
@@ -59,49 +71,56 @@ export function AdminRoles() {
       }
     } catch (err) {
       console.error("Error eliminando rol:", err);
-      if (err.response && err.response.status === 403) {
-        setMensaje("No tiene permisos para eliminar roles");
-      } else {
-        setMensaje("Error eliminando rol");
-      }
+      setMensaje(
+        err.response?.status === 403
+          ? "No tiene permisos para eliminar roles"
+          : "Error eliminando rol"
+      );
     }
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Administración de Roles</h2>
-      {mensaje && <p className="mb-2 text-red-600">{mensaje}</p>}
+    <Box p={3}>
+      <Typography variant="h5" mb={2}>
+        Administración de Roles
+      </Typography>
 
-      <ul className="mb-4">
-        {(Array.isArray(roles) ? roles : []).map((r) => (
-          <li key={r.id} className="flex items-center justify-between mb-1">
-            <span>{r.nombre}</span>
-            <button
-              className="text-white bg-red-500 px-2 py-1 rounded"
-              onClick={() => handleEliminarRol(r.id)}
-            >
-              Eliminar
-            </button>
-          </li>
+      {mensaje && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {mensaje}
+        </Alert>
+      )}
+
+      <List>
+        {roles.map((r) => (
+          <ListItem key={r.id} divider>
+            <ListItemText primary={r.nombre} />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                color="error"
+                onClick={() => handleEliminarRol(r.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
         ))}
-      </ul>
+      </List>
 
-      <form onSubmit={handleCrearRol} className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Nombre del rol"
+      <Box component="form" onSubmit={handleCrearRol} mt={2} display="flex" gap={2}>
+        <TextField
+          label="Nombre del rol"
+          variant="outlined"
           value={nuevoRol}
           onChange={(e) => setNuevoRol(e.target.value)}
-          className="border px-2 py-1 rounded flex-1"
+          fullWidth
           required
         />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-3 py-1 rounded"
-        >
-          Crear Rol
-        </button>
-      </form>
-    </div>
+        <Button type="submit" variant="contained" color="primary">
+          Crear
+        </Button>
+      </Box>
+    </Box>
   );
 }

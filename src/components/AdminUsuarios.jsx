@@ -1,17 +1,34 @@
 import { useState, useEffect } from "react";
-import axios from "../services/axiosConfig"; // Axios con token incluido
+import axios from "../services/axiosConfig";
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Menu,
+  MenuItem,
+  Box,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export function AdminUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [nuevoUsuario, setNuevoUsuario] = useState({ username: "", password: "" });
   const [mensaje, setMensaje] = useState("");
-  const [menuAbierto, setMenuAbierto] = useState(null); // ID del usuario cuyo menú está abierto
+  const [anchorEl, setAnchorEl] = useState(null); // Menú abierto
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState(null);
 
   useEffect(() => {
     cargarUsuarios();
   }, []);
 
-  // Cargar todos los usuarios
   const cargarUsuarios = async () => {
     try {
       const res = await axios.get("/users");
@@ -22,8 +39,18 @@ export function AdminUsuarios() {
     }
   };
 
-  // Cambiar contraseña de un usuario
-  const handleCambiarPassword = async (username) => {
+  const handleAbrirMenu = (event, usuario) => {
+    setAnchorEl(event.currentTarget);
+    setUsuarioSeleccionado(usuario);
+  };
+
+  const handleCerrarMenu = () => {
+    setAnchorEl(null);
+    setUsuarioSeleccionado(null);
+  };
+
+  const handleCambiarPassword = async () => {
+    const username = usuarioSeleccionado.username;
     const nuevaClave = prompt(`Nueva contraseña para ${username}:`);
     if (!nuevaClave) return;
 
@@ -35,11 +62,13 @@ export function AdminUsuarios() {
     } catch (err) {
       console.error(err);
       setMensaje(err.response?.data?.error || "Error al cambiar contraseña");
+    } finally {
+      handleCerrarMenu();
     }
   };
 
-  // Eliminar un usuario
-  const handleEliminarUsuario = async (username) => {
+  const handleEliminarUsuario = async () => {
+    const username = usuarioSeleccionado.username;
     if (!window.confirm(`¿Eliminar usuario ${username}?`)) return;
 
     try {
@@ -49,10 +78,11 @@ export function AdminUsuarios() {
     } catch (err) {
       console.error(err);
       setMensaje(err.response?.data?.error || "Error eliminando usuario");
+    } finally {
+      handleCerrarMenu();
     }
   };
 
-  // Crear un nuevo usuario
   const handleCrearUsuario = async (e) => {
     e.preventDefault();
     if (!nuevoUsuario.username || !nuevoUsuario.password) {
@@ -72,61 +102,69 @@ export function AdminUsuarios() {
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Administración de Usuarios</h2>
-      {mensaje && <p className="mb-4 text-red-600">{mensaje}</p>}
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" mb={2}>
+          Administración de Usuarios
+        </Typography>
 
-      <ul className="mb-6">
-        {usuarios.map((u) => (
-          <li key={u.id} className="mb-2 relative">
-            {u.username}{" "}
-            <button
-              className="ml-2 px-2 py-1 bg-gray-300 rounded"
-              onClick={() => setMenuAbierto(menuAbierto === u.id ? null : u.id)}
+        <List>
+          {usuarios.map((u) => (
+            <ListItem
+              key={u.id}
+              secondaryAction={
+                <IconButton onClick={(e) => handleAbrirMenu(e, u)}>
+                  <MoreVertIcon />
+                </IconButton>
+              }
             >
-              ⋮
-            </button>
+              <ListItemText primary={u.username} />
+            </ListItem>
+          ))}
+        </List>
 
-            {menuAbierto === u.id && (
-              <div className="absolute bg-gray-100 border p-2 mt-1 z-10">
-                <button
-                  className="block w-full mb-1 text-left px-2 py-1 hover:bg-gray-200"
-                  onClick={() => { handleCambiarPassword(u.username); setMenuAbierto(null); }}
-                >
-                  Cambiar Contraseña
-                </button>
-                <button
-                  className="block w-full text-left px-2 py-1 hover:bg-gray-200"
-                  onClick={() => { handleEliminarUsuario(u.username); setMenuAbierto(null); }}
-                >
-                  Eliminar Usuario
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCerrarMenu}>
+          <MenuItem onClick={handleCambiarPassword}>Cambiar Contraseña</MenuItem>
+          <MenuItem onClick={handleEliminarUsuario}>Eliminar Usuario</MenuItem>
+        </Menu>
 
-      <form onSubmit={handleCrearUsuario} className="border-t pt-4">
-        <h3 className="font-semibold mb-2">Crear nuevo usuario</h3>
-        <input
-          type="text"
-          placeholder="Usuario"
-          value={nuevoUsuario.username}
-          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, username: e.target.value })}
-          className="border p-1 mr-2"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={nuevoUsuario.password}
-          onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })}
-          className="border p-1 mr-2"
-          required
-        />
-        <button type="submit" className="px-3 py-1 bg-blue-500 text-white rounded">Crear Usuario</button>
-      </form>
-    </div>
+        <Box component="form" onSubmit={handleCrearUsuario} sx={{ mt: 3 }}>
+          <Typography variant="h6" mb={1}>
+            Crear nuevo usuario
+          </Typography>
+          <TextField
+            label="Usuario"
+            value={nuevoUsuario.username}
+            onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, username: e.target.value })}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <TextField
+            label="Contraseña"
+            type="password"
+            value={nuevoUsuario.password}
+            onChange={(e) => setNuevoUsuario({ ...nuevoUsuario, password: e.target.value })}
+            fullWidth
+            margin="normal"
+            required
+          />
+          <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
+            Crear Usuario
+          </Button>
+        </Box>
+
+        <Snackbar
+          open={Boolean(mensaje)}
+          autoHideDuration={4000}
+          onClose={() => setMensaje("")}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert severity="info" onClose={() => setMensaje("")}>
+            {mensaje}
+          </Alert>
+        </Snackbar>
+      </Paper>
+    </Container>
   );
 }

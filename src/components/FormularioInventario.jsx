@@ -1,133 +1,132 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   crearInventario,
   actualizarInventario,
   getInventarioById,
-} from '../services/inventarioService';
+} from "../services/inventarioService";
+import { TextField, Button, MenuItem, Box, Typography, Paper } from "@mui/material";
 
 const FormularioInventario = () => {
   const [inventario, setInventario] = useState({
-    codigo: '',
-    estado: '',
-    fecha: '',
-    observaciones: '',
+    codigo: "",
+    estado: 0,
+    fecha: "",
+    observaciones: "",
   });
 
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // 🔹 Definimos los estados posibles (valor numérico + etiqueta legible)
   const ESTADOS = [
-    { valor: 0, label: 'Pendiente' },
-    { valor: 1, label: 'En proceso' },
-    { valor: 2, label: 'Finalizado' },
-    { valor: 3, label: 'Cancelado' },
+    { valor: 0, label: "Pendiente" },
+    { valor: 1, label: "En proceso" },
+    { valor: 2, label: "Finalizado" },
+    { valor: 3, label: "Cancelado" },
   ];
 
   useEffect(() => {
     if (id) {
       getInventarioById(id).then((res) => {
         const data = res.data;
-
-        // Aseguramos que la fecha se formatee correctamente
         if (data.fecha) {
-          data.fecha = new Date(data.fecha).toISOString().split('T')[0];
+          data.fecha = new Date(data.fecha).toISOString().split("T")[0];
         }
-
-        // Convertimos estado a número si viene como string
-        if (data.estado !== null && data.estado !== undefined) {
-          data.estado = Number(data.estado);
-        }
-
+        data.estado = Number(data.estado ?? 0);
         setInventario(data);
       });
     }
   }, [id]);
 
-  // 🔹 Convertimos "estado" a número si es necesario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInventario({
       ...inventario,
-      [name]: name === 'estado' ? parseInt(value) : value,
+      [name]: name === "estado" ? Number(value) : value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      if (id) {
-        await actualizarInventario(id, inventario);
-      } else {
-        await crearInventario(inventario);
-      }
-      navigate('/inventarios');
-    } catch (error) {
-      console.error('Error al guardar el inventario', error);
+    if (id) {
+      await actualizarInventario(id, inventario);
+    } else {
+      await crearInventario(inventario);
     }
+    navigate("/inventarios");
   };
 
   return (
-    <div>
-      <h2>{id ? 'Editar' : 'Agregar'} Inventario</h2>
+    <Box display="flex" justifyContent="center" mt={4}>
+      <Paper sx={{ p: 3, width: "400px" }}>
+        <Typography variant="h5" mb={2}>
+          {id ? "Editar" : "Agregar"} Inventario
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Código:</label>
-          <input
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Código"
+            fullWidth
             name="codigo"
-            placeholder="Código"
             value={inventario.codigo}
             onChange={handleChange}
             required
+            margin="normal"
           />
-        </div>
 
-        <div>
-          <label>Estado:</label>
-          <select
+          <TextField
+            select
+            label="Estado"
             name="estado"
+            fullWidth
             value={inventario.estado}
             onChange={handleChange}
-            required
+            margin="normal"
           >
-            <option value="">Seleccionar estado...</option>
-            {ESTADOS.map((e) => (
-              <option key={e.valor} value={e.valor}>
-                {e.label}
-              </option>
+            {ESTADOS.map((item) => (
+              <MenuItem key={item.valor} value={item.valor}>
+                {item.label}
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
 
-        <div>
-          <label>Fecha:</label>
-          <input
-            name="fecha"
+          <TextField
+            label="Fecha"
             type="date"
+            name="fecha"
+            fullWidth
             value={inventario.fecha}
             onChange={handleChange}
+            margin="normal"
+            InputLabelProps={{ shrink: true }}
           />
-        </div>
 
-        <div>
-          <label>Observaciones:</label>
-          <textarea
+          <TextField
+            label="Observaciones"
             name="observaciones"
-            placeholder="Escribí alguna nota..."
+            fullWidth
             value={inventario.observaciones}
             onChange={handleChange}
+            margin="normal"
+            multiline
+            rows={3}
           />
-        </div>
 
-        <button type="submit">Guardar</button>
-        <button type="button" onClick={() => navigate('/inventarios')}>
-          Cancelar
-        </button>
-      </form>
-    </div>
+          <Box display="flex" justifyContent="space-between" mt={2}>
+            <Button type="submit" variant="contained" color="primary">
+              Guardar
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/inventarios")}
+            >
+              Cancelar
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 

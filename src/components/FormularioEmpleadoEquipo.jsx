@@ -1,12 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   crearEmpleadoEquipo,
   actualizarEmpleadoEquipo,
   getEmpleadoEquipoById,
-} from '../services/empleadoEquipoService';
-import { getEmpleados } from '../services/empleadoService';
-import { getEquipos } from '../services/equipoService';
+} from "../services/empleadoEquipoService";
+import { getEmpleados } from "../services/empleadoService";
+import { getEquipos } from "../services/equipoService";
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Box,
+  Typography,
+  Paper,
+} from "@mui/material";
 
 const FormularioEmpleadoEquipo = () => {
   const [empleadoEquipo, setEmpleadoEquipo] = useState({
@@ -22,21 +30,18 @@ const FormularioEmpleadoEquipo = () => {
   const { id } = useParams();
 
   const ROLES = [
-    { valor: 1, label: 'Líder' },
-    { valor: 2, label: 'Técnico' },
-    { valor: 3, label: 'Asistente' },
+    { valor: 1, label: "Líder" },
+    { valor: 2, label: "Técnico" },
+    { valor: 3, label: "Asistente" },
   ];
 
   useEffect(() => {
-    // Cargar empleados y equipos
     getEmpleados().then((res) => setEmpleados(res.data));
     getEquipos().then((res) => setEquipos(res.data));
 
-    // Si estamos editando, traer el registro
     if (id) {
       getEmpleadoEquipoById(id).then((res) => {
         const data = res.data;
-
         setEmpleadoEquipo({
           empleado: data.empleadoId ? String(data.empleadoId) : "",
           equipo: data.equipoId ? String(data.equipoId) : "",
@@ -47,10 +52,9 @@ const FormularioEmpleadoEquipo = () => {
   }, [id]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
     setEmpleadoEquipo({
       ...empleadoEquipo,
-      [name]: value, // guardar TODO como string
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -63,85 +67,94 @@ const FormularioEmpleadoEquipo = () => {
       tipoRol: Number(empleadoEquipo.tipoRol),
     };
 
-    try {
-      if (id) {
-        await actualizarEmpleadoEquipo(id, payload);
-      } else {
-        await crearEmpleadoEquipo(payload);
-      }
-
-      navigate('/empleadoEquipos');
-    } catch (error) {
-      console.error('Error al guardar el empleado-equipo', error);
+    if (id) {
+      await actualizarEmpleadoEquipo(id, payload);
+    } else {
+      await crearEmpleadoEquipo(payload);
     }
+
+    navigate("/empleadoEquipos");
   };
 
   return (
-    <div>
-      <h2>{id ? 'Editar' : 'Agregar'} Empleado - Equipo</h2>
+    <Box display="flex" justifyContent="center" mt={4}>
+      <Paper sx={{ p: 3, width: "400px" }}>
+        <Typography variant="h5" mb={2}>
+          {id ? "Editar" : "Asignar"} Empleado a Equipo
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        
-        {/* Empleado */}
-        <div>
-          <label>Empleado:</label>
-          <select
+        <form onSubmit={handleSubmit}>
+          {/* Empleado */}
+          <TextField
+            select
+            label="Empleado"
             name="empleado"
+            fullWidth
+            required
+            margin="normal"
             value={empleadoEquipo.empleado}
             onChange={handleChange}
-            required
           >
-            <option value="">Seleccionar empleado...</option>
             {empleados.map((emp) => (
-              <option key={emp.id} value={String(emp.id)}>
+              <MenuItem key={emp.id} value={String(emp.id)}>
                 {emp.nombre}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
 
-        {/* Equipo */}
-        <div>
-          <label>Equipo:</label>
-          <select
+          {/* Equipo */}
+          <TextField
+            select
+            label="Equipo"
             name="equipo"
+            fullWidth
+            required
+            margin="normal"
             value={empleadoEquipo.equipo}
             onChange={handleChange}
-            required
           >
-            <option value="">Seleccionar equipo...</option>
             {equipos.map((eq) => (
-              <option key={eq.id} value={String(eq.id)}>
+              <MenuItem key={eq.id} value={String(eq.id)}>
                 {eq.nombre}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
 
-        {/* Rol */}
-        <div>
-          <label>Rol:</label>
-          <select
+          {/* Rol */}
+          <TextField
+            select
+            label="Rol"
             name="tipoRol"
+            fullWidth
+            required
+            margin="normal"
             value={empleadoEquipo.tipoRol}
             onChange={handleChange}
-            required
           >
-            <option value="">Seleccionar rol...</option>
             {ROLES.map((r) => (
-              <option key={r.valor} value={String(r.valor)}>
+              <MenuItem key={r.valor} value={String(r.valor)}>
                 {r.label}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </TextField>
 
-        <button type="submit">Guardar</button>
-        <button type="button" onClick={() => navigate('/empleadoEquipos')}>
-          Cancelar
-        </button>
-      </form>
-    </div>
+          <Box display="flex" justifyContent="space-between" mt={2}>
+            <Button type="submit" variant="contained">
+              Guardar
+            </Button>
+
+            <Button
+              type="button"
+              variant="outlined"
+              color="secondary"
+              onClick={() => navigate("/empleadoEquipos")}
+            >
+              Cancelar
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 

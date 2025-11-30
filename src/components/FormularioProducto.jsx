@@ -1,13 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+// src/components/FormularioProducto.jsx
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   crearProducto,
   actualizarProducto,
   getProductoById,
-} from '../services/productoService';
+} from "../services/productoService";
+
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+} from "@mui/material";
 
 const FormularioProducto = () => {
-  const [producto, setProducto] = useState({ nombre: '', precio: '' });
+  const [producto, setProducto] = useState({ nombre: "", precio: "" });
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -23,33 +33,61 @@ const FormularioProducto = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!producto.nombre || !producto.precio) {
+      alert("Completa todos los campos.");
+      return;
+    }
+
     if (id) {
       await actualizarProducto(id, producto);
     } else {
       await crearProducto(producto);
     }
-    navigate('/');
+
+    navigate("/productos");
   };
 
   return (
-    <div>
-      <h2>{id ? 'Editar' : 'Agregar'} Producto</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="nombre"
-          placeholder="Nombre"
-          value={producto.nombre}
-          onChange={handleChange}
-        />
-        <input
-          name="precio"
-          placeholder="Precio"
-          value={producto.precio}
-          onChange={handleChange}
-        />
-        <button type="submit">Guardar</button>
-      </form>
-    </div>
+    <Box maxWidth={450} mx="auto">
+      <Typography variant="h4" gutterBottom>
+        {id ? "Editar" : "Agregar"} Producto
+      </Typography>
+
+      <Card>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Nombre"
+              name="nombre"
+              fullWidth
+              margin="normal"
+              value={producto.nombre}
+              onChange={handleChange}
+            />
+
+            <TextField
+              label="Precio"
+              name="precio"
+              type="number"
+              fullWidth
+              margin="normal"
+              value={producto.precio}
+              onChange={handleChange}
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Guardar
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 

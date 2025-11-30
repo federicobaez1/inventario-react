@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { getEmpleados, eliminarEmpleado } from '../services/empleadoService';
 import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  IconButton,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 
 const ListaEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -16,24 +30,54 @@ const ListaEmpleados = () => {
   };
 
   const handleEliminar = async (id) => {
-    await eliminarEmpleado(id);
-    cargarEmpleados();
+    if (window.confirm('¿Desea eliminar este empleado?')) {
+      await eliminarEmpleado(id);
+      cargarEmpleados();
+    }
   };
 
   return (
-    <div>
-      <h2>Lista de Empleados</h2>
-      <button onClick={() => navigate('/agregar-empleado')}>Agregar Empleado</button>
-      <ul>
-        {empleados.map(p => (
-          <li key={p.id}>
-            {p.nombre} 
-            <button onClick={() => navigate(`/editar-empleado/${p.id}`)}>Editar</button>
-            <button onClick={() => handleEliminar(p.id)}>Eliminar</button>
-          </li>
+    <Box sx={{ p: 4, maxWidth: 600, mx: 'auto' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h5">Lista de Empleados</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/agregar-empleado')}
+        >
+          Agregar
+        </Button>
+      </Box>
+
+      <List>
+        {empleados.map((p) => (
+          <React.Fragment key={p.id}>
+            <ListItem>
+              <ListItemText primary={p.nombre} />
+              <ListItemSecondaryAction>
+                <IconButton
+                  edge="end"
+                  color="primary"
+                  onClick={() => navigate(`/editar-empleado/${p.id}`)}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  color="error"
+                  onClick={() => handleEliminar(p.id)}
+                  sx={{ ml: 1 }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+            </ListItem>
+            <Divider />
+          </React.Fragment>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 };
 

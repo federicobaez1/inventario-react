@@ -32,6 +32,7 @@ const menuItems = [
   { text: "Depósitos", icon: <WarehouseIcon />, path: "/depositos" },
   { text: "Inventarios", icon: <InventoryIcon />, path: "/inventarios" },
   { text: "Empleado-Equipo", icon: <PeopleIcon />, path: "/empleadoequipos" },
+  { text: "Empleados", icon: <PeopleIcon />, path: "/empleados" },
   { text: "Equipos", icon: <DevicesIcon />, path: "/equipos" },
   { text: "Usuarios", icon: <SecurityIcon />, path: "/admin" },
   { text: "Roles", icon: <SecurityIcon />, path: "/admin-roles" },

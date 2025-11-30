@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   crearEquipo,
   actualizarEquipo,
   getEquipoById,
-} from '../services/equipoService';
+} from "../services/equipoService";
+
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Box,
+} from "@mui/material";
 
 const FormularioEquipo = () => {
-  const [equipo, setEquipo] = useState({ nombre: ''});
+  const [equipo, setEquipo] = useState({ nombre: "" });
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -28,23 +37,33 @@ const FormularioEquipo = () => {
     } else {
       await crearEquipo(equipo);
     }
-    navigate('/');
+    navigate("/equipos"); // <-- vuelve a la lista de equipos
   };
 
   return (
-    <div>
-      <h2>{id ? 'Editar' : 'Agregar'} Equipo</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="nombre"
-          placeholder="Nombre"
-          value={equipo.nombre}
-          onChange={handleChange}
-        />
-        
-        <button type="submit">Guardar</button>
-      </form>
-    </div>
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
+      <Paper sx={{ p: 3 }}>
+        <Typography variant="h5" mb={2}>
+          {id ? "Editar" : "Agregar"} Equipo
+        </Typography>
+
+        <Box component="form" onSubmit={handleSubmit}>
+          <TextField
+            name="nombre"
+            label="Nombre del Equipo"
+            value={equipo.nombre}
+            onChange={handleChange}
+            fullWidth
+            required
+            margin="normal"
+          />
+
+          <Button variant="contained" color="primary" type="submit" fullWidth>
+            Guardar
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 
