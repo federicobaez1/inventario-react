@@ -1,6 +1,6 @@
 // src/components/Layout.jsx
 import { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Box,
@@ -14,6 +14,9 @@ import {
   ListItemIcon,
   ListItemText,
   CssBaseline,
+  Avatar,
+  Menu,
+  MenuItem
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -36,16 +39,25 @@ const menuItems = [
   { text: "Equipos", icon: <DevicesIcon />, path: "/equipos" },
   { text: "Usuarios", icon: <SecurityIcon />, path: "/admin" },
   { text: "Roles", icon: <SecurityIcon />, path: "/admin-roles" },
-  { text: "Contraseña", icon: <LockIcon />, path: "/cambiar-password" },
   { text: "Detalles", icon: <InventoryIcon />, path: "/detalleInventarios" },
   { text: "Importar Excel", icon: <ImportExportIcon />, path: "/importar-excel" },
 ];
 
 export default function Layout() {
   const [open, setOpen] = useState(true);
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const toggleDrawer = () => {
-    setOpen(!open);
+  const navigate = useNavigate();
+  const username = localStorage.getItem("username");
+
+  const toggleDrawer = () => setOpen(!open);
+  const handleMenu = (event) => setAnchorEl(event.currentTarget);
+  const handleCloseMenu = () => setAnchorEl(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwtToken");
+    localStorage.removeItem("username");
+    navigate("/login");
   };
 
   return (
@@ -53,22 +65,39 @@ export default function Layout() {
       <CssBaseline />
 
       {/* NAVBAR */}
-      <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      >
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={toggleDrawer}
-            sx={{ mr: 2 }}
-          >
+          <IconButton edge="start" color="inherit" onClick={toggleDrawer} sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
+
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Inventario
           </Typography>
+
+          {/* Username + Avatar con menú */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="body1" sx={{ mr: 1 }}>
+              {username}
+            </Typography>
+
+            <IconButton onClick={handleMenu} size="small">
+              <Avatar sx={{ bgcolor: "secondary.main" }}>
+                {username?.[0]?.toUpperCase()}
+              </Avatar>
+            </IconButton>
+
+            <Menu
+              id="menu-logout"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+            >
+              <MenuItem onClick={handleLogout}>Cerrar sesión</MenuItem>
+            </Menu>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -79,8 +108,6 @@ export default function Layout() {
         sx={{
           width: open ? drawerWidth : 64,
           flexShrink: 0,
-          whiteSpace: "nowrap",
-          boxSizing: "border-box",
           "& .MuiDrawer-paper": {
             width: open ? drawerWidth : 64,
             transition: "width 0.3s",
@@ -109,6 +136,7 @@ export default function Layout() {
                 >
                   {item.icon}
                 </ListItemIcon>
+
                 {open && <ListItemText primary={item.text} />}
               </ListItemButton>
             </ListItem>
@@ -122,8 +150,8 @@ export default function Layout() {
         sx={{
           flexGrow: 1,
           p: 3,
-          transition: "margin-left 0.3s",
           ml: open ? `${drawerWidth}px` : "64px",
+          transition: "margin-left 0.3s",
         }}
       >
         <Toolbar />
